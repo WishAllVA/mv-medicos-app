@@ -1,0 +1,44 @@
+.dashboard {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  max-width: 1400px; /* Increased maximum width for the dashboard */
+  margin: 0 auto; /* Center the dashboard */
+}
+
+.dashboard h1 {
+  color: #333;
+  text-align: center;
+}
+
+.dashboard p {
+  color: #666;
+  text-align: center;
+}
+
+.dashboard-sections {
+  display: flex;
+  justify-content: center; /* Changed to center the sections */
+  flex-wrap: wrap; /* Allow wrapping of sections */
+  gap: 20px; /* Added gap between sections */
+  margin-top: 20px;
+}
+
+.dashboard-sections section {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  flex: 1 1 300px; /* Allow sections to grow and shrink */
+  max-width: 30%; /* Reduced maximum width */
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-sections section h2 {
+  color: #444;
+  margin-bottom: 10px;
+}
+
+.dashboard-sections section p {
+  color: #777;
+  margin-bottom: 0;
+}

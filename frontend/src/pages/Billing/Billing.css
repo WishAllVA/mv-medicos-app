@@ -1,0 +1,43 @@
+.billing-page {
+  padding: 20px;
+}
+
+.bills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.bill-card {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  width: 200px;
+}
+
+.bill-card h2 {
+  margin-top: 0;
+}
+
+.bill-time {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 10px;
+  font-style: italic;
+}
+
+.show-bill {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
