@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Billing.css';
 import NewBillPopup from './NewBillPopup';
-import axios from 'axios';
+import axiosInstance from '../../axiosConfig';
 
 const Billing = () => {
   const [bills, setBills] = useState([]);
@@ -16,22 +16,19 @@ const Billing = () => {
   const [filter, setFilter] = useState('all');
 
   useEffect(() => {
-    fetchBills();
-  }, [filter]);
-
-  const fetchBills = async () => {
-    try {
-      const response = await axios.get(`http://localhost:3000/api/bills?filter=${filter}`, {
-        headers: {
-            "Content-Type": 'application/json'
-        }
-      });
+    axiosInstance.get(`/api/bills?filter=${filter}`, {
+      headers: {
+        "Content-Type": 'application/json'
+      }
+    })
+    .then(response => {
       console.log(response)
       setBills(response.data);
-    } catch (error) {
+    })
+    .catch(error => {
       console.error('Error fetching bills', error);
-    }
-  };
+    });
+  }, [filter]);
 
   const handleAddMedicine = () => {
     setNewBill({
@@ -54,7 +51,7 @@ const Billing = () => {
     }
     const newBillWithTime = { ...newBill, time: new Date(), amount: calculateTotal(newBill.medicines) - newBill.discount };
     try {
-      const response = await axios.post('http://localhost:3000/api/bills/add', newBillWithTime)
+      const response = await axiosInstance.post('/api/bills/add', newBillWithTime)
       setBills([...bills, response.data.bill]);
       setShowPopup(false);
       setNewBill({ patientName: '', medicines: [{ name: '', quantity: 0, price: 0 }], amount: 0, discount: 0 });

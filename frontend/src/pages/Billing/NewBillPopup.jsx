@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FaTrash } from 'react-icons/fa'; // Import the trash icon
 import './NewBillPopup.css';
 
 const NewBillPopup = ({ newBill, setNewBill, handleAddMedicine, handleMedicineChange, handleSubmit, setShowPopup, error }) => {
@@ -37,30 +38,37 @@ const NewBillPopup = ({ newBill, setNewBill, handleAddMedicine, handleMedicineCh
           />
         </label>
         <h3 className="popup-subtitle">Medicines</h3>
+        <div className="medicine-input">
+          <label className="medicine-label-inline">Name</label>
+          <label className="medicine-label-inline">Quantity</label>
+          <label className="medicine-label-inline">Price</label>
+        </div>
         {newBill.medicines.map((medicine, index) => (
           <div key={index} className="medicine-input">
             <input
               type="text"
-              className="popup-input"
+              className="popup-input medicine-name"
               placeholder="Medicine Name"
               value={medicine.name}
               onChange={(e) => handleMedicineChange(index, 'name', e.target.value)}
             />
             <input
               type="number"
-              className="popup-input"
+              className="popup-input medicine-quantity"
               placeholder="Quantity"
               value={medicine.quantity}
               onChange={(e) => handleMedicineChange(index, 'quantity', e.target.value)}
             />
             <input
               type="number"
-              className="popup-input"
+              className="popup-input medicine-price"
               placeholder="Price"
               value={medicine.price}
               onChange={(e) => handleMedicineChange(index, 'price', e.target.value)}
             />
-            <button className="popup-button remove" onClick={() => handleRemoveMedicine(index)}>Remove</button>
+            <button className="popup-button remove-medicine-from-bill-button" onClick={() => handleRemoveMedicine(index)}>
+              <FaTrash /> {/* Use the trash icon */}
+            </button>
           </div>
         ))}
         <button className="popup-button add" onClick={handleAddMedicine}>+</button>

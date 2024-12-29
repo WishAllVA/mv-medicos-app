@@ -71,3 +71,17 @@ button:hover {
   outline: none;
   border-color: #007bff;
 }
+
+.remove-button {
+  padding: 5px 10px;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px; /* Reduce font size */
+  min-width: 60px; /* Set a minimum width */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

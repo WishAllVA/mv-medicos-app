@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Line, Bar } from 'react-chartjs-2';
-import axios from 'axios';
+import axiosInstance from '../../axiosConfig';
 import './Reports.css';
 
 import {
@@ -60,14 +60,7 @@ const Reports = () => {
 
     const fetchData = async () => {
         try {
-            // Dummy response
-            const response = {
-                data: {
-                    labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
-                    amounts: [100, 200, 150, 300, 250, 400, 350],
-                    bills: [10, 20, 15, 30, 25, 40, 35]
-                }
-            };
+            const response = await axiosInstance.get('/api/reports/total-amount');
             const data = response.data;
             setChartData({
                 labels: data.labels,
@@ -82,7 +75,7 @@ const Reports = () => {
                 ],
             });
         } catch (error) {
-            console.error('Error fetching data', error);
+            console.error('There was an error fetching the reports!', error);
         }
     };
 

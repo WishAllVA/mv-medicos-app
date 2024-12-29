@@ -28,12 +28,19 @@ router.post('/add', [
 
 // Route to get inventory list
 router.get('/', async (req, res) => {
-    const { sort, limit } = req.query
+    const { sort, limit, offset } = req.query
     try {
-        const inventory = await Inventory.find()
-            .sort(sort ? { [sort]: 1 } : {})
-            .limit(limit ? parseInt(limit) : 0)
-        res.status(200).json(inventory)
+        const totalCount = await Inventory.countDocuments();
+        const pipeline = [
+            { $sort: sort ? { [sort]: 1 } : {} },
+            { $skip: offset ? parseInt(offset) : 0 },
+            { $limit: limit ? parseInt(limit) : 0 },
+            { $match: {} }
+        ];
+
+        const medicines = await Inventory.aggregate(pipeline);
+
+        res.status(200).json({ success: true, medicines, totalCount });
     } catch (err) {
         console.error(err)
         res.status(500).json({ error: 'Failed to retrieve inventory' })

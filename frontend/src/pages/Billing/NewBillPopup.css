@@ -30,6 +30,27 @@
   flex: 1;
 }
 
+.medicine-input .medicine-name {
+  flex: 4;
+}
+
+.medicine-input .medicine-quantity,
+.medicine-input .medicine-price {
+  flex: 1;
+}
+
+.medicine-label {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.medicine-label-inline {
+  flex: 1;
+  font-weight: bold;
+  text-align: center;
+}
+
 .popup-title {
   font-size: 26px;
   margin-bottom: 15px;
@@ -70,7 +91,7 @@
   background-color: #007bff;
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 10px 15px; /* Adjusted padding to make the button narrower */
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
@@ -89,17 +110,18 @@
   background-color: #c82333;
 }
 
-.popup-button.remove {
+.popup-button.remove-medicine-from-bill-button {
   background-color: #dc3545;
   color: white;
   border: none;
-  padding: 5px 10px;
+  padding: 5px 5px; /* Adjusted padding to make the button narrower */
   border-radius: 5px;
   cursor: pointer;
   font-size: 14px;
+  max-width: 15%;
 }
 
-.popup-button.remove:hover {
+.popup-button.remove-medicine-from-bill-button:hover {
   background-color: #c82333;
 }
 

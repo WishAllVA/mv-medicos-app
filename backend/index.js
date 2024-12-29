@@ -3,16 +3,27 @@ const express = require('express')
 const mongoose = require('./mongoose/mongoose')
 const billRoutes = require('./routes/billRoutes')
 const inventoryRoutes = require('./routes/inventoryRoutes')
+const loginRoutes = require('./routes/loginRoutes')
 const cors = require('cors')
+const jwtMiddleware = require('./middleware/jwtMiddleware')
+const reportsRoutes = require('./routes/reportsRoutes')
 
 const app = express()
 const API_LISTENER_PORT = process.env.PORT || 3000
 
+// CORS middleware to allow specific headers and credentials
+app.use(cors({
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}))
+
 // Middleware to parse JSON
 app.use(express.json())
 
-// CORS middleware to allow everything
-app.use(cors())
+// JWT Middleware
+app.use(jwtMiddleware)
 
 // Health check endpoint
 app.use('/health', (req, res, next) => {
@@ -26,6 +37,12 @@ app.use('/api/bills', billRoutes)
 
 // Inventory routes
 app.use('/api/inventory', inventoryRoutes)
+
+// Login routes
+app.use('/api/login', loginRoutes)
+
+// Reports routes
+app.use('/api/reports', reportsRoutes)
 
 // Error handling middleware
 app.use((err, req, res, next) => {
