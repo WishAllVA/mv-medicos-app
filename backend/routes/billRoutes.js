@@ -52,9 +52,20 @@ router.post('/add', [
 // Route to get bills with sorting and limiting options
 router.get('/', async (req, res) => {
     console.log('getting bills')
-    const { sort, limit } = req.query
+    const { sort, limit, start, end } = req.query
+    console.log(req.query)
+    const filter = {}
+
+    if (start) {
+        filter.time = { $gte: new Date(start) }
+    }
+    if (end) {
+        filter.time = filter.time || {}
+        filter.time.$lte = new Date(end)
+    }
+
     try {
-        const bills = await Bill.find()
+        const bills = await Bill.find(filter)
             .sort(sort ? { [sort]: 1 } : {})
             .limit(limit ? parseInt(limit) : 0)
         res.status(200).json(bills)

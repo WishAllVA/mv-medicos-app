@@ -1,8 +1,19 @@
 .navbar {
-    background-color: #1abc9c; /* Updated color */
+    background-color: #3498db; /* Updated to a lighter blue color */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Added shadow for a fancy look */
     overflow: hidden;
     padding: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    color: white;
+}
+
+.navbar-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    padding-left: 20px;
 }
 
 .navbar-list {
@@ -11,27 +22,27 @@
     padding: 0;
     display: flex;
     justify-content: space-around;
-    align-items: center; /* Center items vertically */
+    align-items: center;
+    gap: 20px;
 }
 
 .navbar-item {
-    margin: 0 1rem; /* Added margin for spacing between items */
+    margin: 0 1rem;
 }
 
 .navbar-item a {
     display: block;
-    color: #ecf0f1; /* Updated color */
+    color: #ecf0f1;
     text-align: center;
-    padding: 10px 15px; /* Increased padding for better spacing */
+    padding: 10px 15px;
     text-decoration: none;
     font-size: 1rem;
-    border-radius: 4px; /* Added border radius for rounded corners */
-    transition: background-color 0.3s, transform 0.3s; /* Added transition for smooth hover effect */
+    border-radius: 4px;
+    transition: background-color 0.3s, transform 0.3s;
 }
 
 .navbar-item a:hover {
-    background-color: #16a085; /* Updated color */
-    color: #ffffff; 
-    text-decoration: underline;
-    transform: scale(1.1); /* Added scale effect on hover */
+    background-color: #2980b9;
+    color: #ffffff;
+    transform: scale(1.1);
 }

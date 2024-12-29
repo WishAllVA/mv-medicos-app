@@ -11,13 +11,16 @@ const Inventory = () => {
   const [isAddPopupOpen, setIsAddPopupOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchBy, setSearchBy] = useState('name')
   const limit = 10
 
   useEffect(() => {
+    console.log('useEffect')
     const fetchMedicines = async () => {
       const offset = (currentPage - 1) * limit
       try {
-        const response = await axiosInstance.get(`/api/inventory?sort=name&limit=${limit}&offset=${offset}`)
+        const response = await axiosInstance.get(`/api/inventory?sort=name&limit=${limit}&offset=${offset}&search=${searchQuery}&searchBy=${searchBy}`)
         setMedicines(response.data.medicines)
         setTotalPages(Math.ceil(response.data.totalCount / limit))
       } catch (error) {
@@ -26,7 +29,7 @@ const Inventory = () => {
     };
 
     fetchMedicines()
-  }, [currentPage])
+  }, [currentPage, searchQuery, searchBy])
 
   const addMedicine = async (medicineDetails) => {
     try {
@@ -74,12 +77,32 @@ const Inventory = () => {
       <div className="add-medicine">
         <button className="add-medicine-button" onClick={() => setIsAddPopupOpen(true)}>Add Medicine</button>
       </div>
+      <div className="search-medicine">
+        <select className="search-dropdown" value={searchBy} onChange={(e) => setSearchBy(e.target.value)}>
+          <option value="name">Medicine Name</option>
+          <option value="salt">Salt</option>
+          <option value="manufacturer">Manufacturer</option>
+        </select>
+        <input 
+          type="text" 
+          className="search-input"
+          placeholder="Search medicine..." 
+          value={searchQuery} 
+          onChange={(e) => setSearchQuery(e.target.value)} 
+        />
+      </div>
       <ul className="medicine-list">
+        <li className="medicine-list-header">
+          <span>Medicine Name</span>
+          <span>Quantity</span>
+          <span>MRP</span>
+          <span></span> {/* Empty span for the remove button column */}
+        </li>
         {medicines && medicines.map(({ medicine, quantity }, index) => (
           <li key={index} onClick={() => showMedicineInfo({ ...medicine, quantity })}>
             <span>{medicine.name}</span>
-            <span>Quantity: {quantity}</span>
-            <span>MRP: ₹{medicine.price}</span>
+            <span>{quantity}</span>
+            <span>₹{medicine.price}</span>
             <button className="remove-button" onClick={(e) => { e.stopPropagation(); removeMedicine(index); }}>Remove</button>
           </li>
         ))}

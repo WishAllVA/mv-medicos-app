@@ -20,7 +20,7 @@ function Login() {
       if (response.status === 200) {
         const data = response.data;
         localStorage.setItem('token', data.token);
-        navigate('/home');
+        navigate('/inventory');
       } else {
         setError('Invalid username or password');
       }

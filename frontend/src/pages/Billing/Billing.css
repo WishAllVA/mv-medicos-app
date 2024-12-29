@@ -13,6 +13,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
+  align-items: stretch; /* Ensure all cards have the same height */
 }
 
 .bill-card {
@@ -20,18 +21,33 @@
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 20px;
-  width: 200px;
+  width: 250px; /* Increase the width of the cards */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 300px; /* Set a fixed height for all cards */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 
 .bill-card h2 {
   margin-top: 0;
+  min-height: 3rem; /* Ensure consistent height for titles */
+  max-height: 3rem; /* Set a maximum height for titles */
+  overflow: hidden; /* Hide overflow text */
+  text-overflow: ellipsis; /* Add ellipsis for overflow text */
+  white-space: nowrap; /* Prevent text from wrapping */
 }
 
 .bill-time {
-  font-size: 14px;
+  font-size: 0.9rem; /* Reduce font size */
   color: #888;
   margin-bottom: 10px;
   font-style: italic;
+  color: #666;
+  min-height: 1.5rem; /* Ensure consistent height for time */
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide overflow text */
+  text-overflow: ellipsis; /* Add ellipsis for overflow text */
 }
 
 .show-bill {
@@ -84,4 +100,28 @@ button:hover {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.bill-title, .bill-time, .bill-medicines, .bill-total {
+  margin: 0;
+  padding: 0.5rem 0;
+}
+
+.bill-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.bill-medicines {
+  list-style-type: none;
+  padding: 0;
+  flex-grow: 1; /* Allow the list to grow and take available space */
+  overflow-y: auto; /* Add scroll if the list is too long */
+}
+
+.bill-total {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-top: auto;
+  min-height: 2rem; /* Ensure consistent height for total */
 }

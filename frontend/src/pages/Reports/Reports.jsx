@@ -53,14 +53,17 @@ const Reports = () => {
     const [chartType, setChartType] = useState('line');
     const [dataType, setDataType] = useState('amount');
     const [chartData, setChartData] = useState(null);
+    const [medicinesData, setMedicinesData] = useState([]);
 
     useEffect(() => {
         fetchData();
+        fetchMedicinesData();
     }, [timeRange, dataType]);
 
     const fetchData = async () => {
         try {
-            const response = await axiosInstance.get('/api/reports/total-amount');
+            const endpoint = dataType === 'amount' ? '/api/reports/total-amount' : '/api/reports/total-bills';
+            const response = await axiosInstance.get(`${endpoint}?days=${timeRange}`);
             const data = response.data;
             setChartData({
                 labels: data.labels,
@@ -76,6 +79,15 @@ const Reports = () => {
             });
         } catch (error) {
             console.error('There was an error fetching the reports!', error);
+        }
+    };
+
+    const fetchMedicinesData = async () => {
+        try {
+            const response = await axiosInstance.get('/api/reports/top-sold-medicine');
+            response.data && setMedicinesData(response.data.topSoldMedicines);
+        } catch (error) {
+            console.error('There was an error fetching the top sold medicines!', error);
         }
     };
 
@@ -192,7 +204,7 @@ const Reports = () => {
                 <div className="medicines-section">
                     <h3>Top Sold Medicines</h3>
                     <ul>
-                        {dummyMedicinesData.map((medicine, index) => (
+                        {medicinesData.map((medicine, index) => (
                             <li key={index}>
                                 {medicine.name} - {medicine.sold} units
                             </li>

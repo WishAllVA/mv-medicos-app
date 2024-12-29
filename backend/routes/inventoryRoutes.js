@@ -37,9 +37,9 @@ router.post('/add', [
 
 // Route to get inventory list
 router.get('/', async (req, res) => {
-    const { sort, limit, offset } = req.query
+    const { sort, limit, offset, search, searchBy } = req.query
     try {
-        const totalCount = await Inventory.countDocuments();
+        const totalCount = await Inventory.countDocuments()
         const pipeline = [
             { $sort: sort ? { [sort]: 1 } : {} },
             { $skip: offset ? parseInt(offset) : 0 },
@@ -51,7 +51,7 @@ router.get('/', async (req, res) => {
                 as: 'medicine'
             }},
             { $unwind: '$medicine' },
-            { $match: {} }
+            { $match: search && searchBy ? { [`medicine.${searchBy}`]: { $regex: search, $options: 'i' } } : {} }
         ];
 
         const medicines = await Inventory.aggregate(pipeline);

@@ -47,6 +47,13 @@
   padding: 20px;
 }
 
+.add-medicine {
+  display: flex;
+  align-items: center;
+  padding: 10px 0px;
+  margin-bottom: 10px;
+}
+
 .add-medicine input {
   padding: 10px;
   margin-right: 10px;
@@ -54,13 +61,34 @@
   border-radius: 4px;
 }
 
-.add-medicine {
-  padding: 10px 20px;
-  margin-bottom: 20px;
+.search-medicine {
+  display: flex;
+  align-items: center;
+  margin-left: auto; /* Push the search input to the right */
+}
+
+.search-medicine select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 10px; /* Add margin to the right of the dropdown */
+}
+
+.search-medicine input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 .add-medicine button:hover {
   background-color: #218838;
+}
+
+.add-medicine-button,
+.search-input,
+.search-dropdown {
+  font-family: inherit;
+  font-size: inherit;
 }
 
 .add-medicine-button {
@@ -83,8 +111,8 @@
 }
 
 .medicine-list li {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
   align-items: center;
   padding: 10px;
   border: 1px solid #ccc;
@@ -98,6 +126,11 @@
   align-items: center;
 }
 
+.medicine-list-header {
+  font-weight: bold;
+  background-color: #f0f0f0;
+}
+
 .remove-button {
   margin-left: 10px;
   padding: 5px 10px;
@@ -109,8 +142,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: auto; /* Ensure the button width is auto */
-  flex-shrink: 0; /* Prevent the button from shrinking */
+  width: auto;
+  flex-shrink: 0;
 }
 
 .pagination {
@@ -150,6 +183,6 @@
 .pagination span {
   margin: 0 10px;
   font-weight: bold;
-  min-width: 50px; /* Ensure the span has a minimum width */
-  text-align: center; /* Center the text inside the span */
+  min-width: 50px;
+  text-align: center;
 }
