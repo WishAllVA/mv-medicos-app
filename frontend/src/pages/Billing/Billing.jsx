@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Billing.css';
 import NewBillPopup from './NewBillPopup';
+import axios from 'axios';
 
 const Billing = () => {
   const [bills, setBills] = useState([]);
@@ -8,8 +9,29 @@ const Billing = () => {
   const [newBill, setNewBill] = useState({
     patientName: '',
     medicines: [{ name: '', quantity: 0, price: 0 }],
+    amount: 0,
+    discount: 0,
   });
   const [error, setError] = useState('');
+  const [filter, setFilter] = useState('all');
+
+  useEffect(() => {
+    fetchBills();
+  }, [filter]);
+
+  const fetchBills = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/api/bills?filter=${filter}`, {
+        headers: {
+            "Content-Type": 'application/json'
+        }
+      });
+      console.log(response)
+      setBills(response.data);
+    } catch (error) {
+      console.error('Error fetching bills', error);
+    }
+  };
 
   const handleAddMedicine = () => {
     setNewBill({
@@ -25,21 +47,26 @@ const Billing = () => {
     setNewBill({ ...newBill, medicines: updatedMedicines });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (newBill.medicines.length === 0 || newBill.medicines.some(med => !med.name || med.quantity <= 0 || med.price <= 0)) {
       setError("Please add at least one valid medicine.");
       return;
     }
-    const newBillWithTime = { ...newBill, time: new Date() };
-    setBills([...bills, newBillWithTime]);
-    setShowPopup(false);
-    setNewBill({ patientName: '', medicines: [{ name: '', quantity: 0, price: 0 }] });
-    setError('');
+    const newBillWithTime = { ...newBill, time: new Date(), amount: calculateTotal(newBill.medicines) - newBill.discount };
+    try {
+      const response = await axios.post('http://localhost:3000/api/bills/add', newBillWithTime)
+      setBills([...bills, response.data.bill]);
+      setShowPopup(false);
+      setNewBill({ patientName: '', medicines: [{ name: '', quantity: 0, price: 0 }], amount: 0, discount: 0 });
+      setError('');
+    } catch (error) {
+      console.error('Error submitting new bill', error);
+    }
   };
 
   const handleClosePopup = () => {
     setShowPopup(false);
-    setNewBill({ patientName: '', medicines: [{ name: '', quantity: 0, price: 0 }] });
+    setNewBill({ patientName: '', medicines: [{ name: '', quantity: 0, price: 0 }], amount: 0, discount: 0 });
   };
 
   const calculateTotal = (medicines) => {
@@ -49,7 +76,19 @@ const Billing = () => {
   return (
     <div className="billing-page">
       <h1>Billing</h1>
-      <button className='show-bill' onClick={() => setShowPopup(true)}>Create New Bill</button>
+      <div className="controls-container">
+        <button className='show-bill' onClick={() => setShowPopup(true)}>Create New Bill</button>
+        <div className="filter-container">
+          <label htmlFor="filter">Filter by: </label>
+          <select id="filter" value={filter} onChange={(e) => setFilter(e.target.value)}>
+            <option value="all">All</option>
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="thisWeek">This Week</option>
+            <option value="thisMonth">This Month</option>
+          </select>
+        </div>
+      </div>
       <div className="bills-list">
         {bills
           .slice()
@@ -67,7 +106,7 @@ const Billing = () => {
                   </li>
                 ))}
               </ul>
-              <p>Total: ₹{calculateTotal(bill.medicines)}</p>
+              <p>Total: ₹{calculateTotal(bill.medicines) - bill.discount}</p>
             </div>
           ))}
       </div>

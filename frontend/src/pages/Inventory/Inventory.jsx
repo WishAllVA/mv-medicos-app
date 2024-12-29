@@ -1,21 +1,67 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import './Inventory.css'
 import MedicinePopup from './MedicinePopup.jsx'
-import AddMedicinePopup from './AddMedicinePopup.jsx' // Import the new component
+import AddMedicinePopup from './AddMedicinePopup.jsx'
 
 const Inventory = () => {
-  const [medicines, setMedicines] = useState([]);
-  const [selectedMedicine, setSelectedMedicine] = useState(null);
-  const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
+  const [medicines, setMedicines] = useState([])
+  const [selectedMedicine, setSelectedMedicine] = useState(null)
+  const [isAddPopupOpen, setIsAddPopupOpen] = useState(false)
 
-  const addMedicine = (medicineDetails) => {
-    setMedicines([...medicines, medicineDetails]);
-    setIsAddPopupOpen(false);
+  useEffect(() => {
+    const fetchMedicines = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/inventory');
+        if (response.ok) {
+          const data = await response.json();
+          setMedicines(data);
+        } else {
+          console.error('Failed to fetch medicines');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+
+    fetchMedicines();
+  }, []);
+
+  const addMedicine = async (medicineDetails) => {
+    try {
+      const response = await fetch('http://localhost:3000/api/inventory/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(medicineDetails),
+      })
+      if (response.ok) {
+        const newMedicine = await response.json()
+        setMedicines([...medicines, newMedicine])
+        setIsAddPopupOpen(false)
+      } else {
+        console.error('Failed to add medicine')
+      }
+    } catch (error) {
+      console.error('Error:', error)
+    }
   };
 
-  const removeMedicine = (index) => {
-    const newMedicines = medicines.filter((_, i) => i !== index);
-    setMedicines(newMedicines);
+  const removeMedicine = async (index) => {
+    const medicineToRemove = medicines[index];
+    try {
+      const response = await fetch(`http://localhost:3000/api/inventory/${medicineToRemove.id}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        const newMedicines = medicines.filter((_, i) => i !== index);
+        setMedicines(newMedicines);
+      } else {
+        console.error('Failed to remove medicine');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   const showMedicineInfo = (medicine) => {

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar/Navbar.jsx';
 import Inventory from './pages/Inventory/Inventory.jsx';
 import Billing from './pages/Billing/Billing.jsx';
+import Reports from './pages/Reports/Reports.jsx';
 
 function App() {
   return (
@@ -13,7 +14,7 @@ function App() {
           {/* <Route path="/" element={<Dashboard />} /> */}
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/billing" element={<Billing />} />
-          {/* <Route path="/" element={<Dashboard />} /> */}
+          <Route path="/reports" element={<Reports />} />
         </Routes>
       </div>
     </Router>
