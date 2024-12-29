@@ -47,10 +47,6 @@
   padding: 20px;
 }
 
-.add-medicine {
-  margin-bottom: 20px;
-}
-
 .add-medicine input {
   padding: 10px;
   margin-right: 10px;
@@ -60,13 +56,7 @@
 
 .add-medicine {
   padding: 10px 20px;
-  background-color: #28a745;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  width: auto; /* Ensure the button width is auto */
-  flex-shrink: 0; /* Prevent the button from shrinking */
+  margin-bottom: 20px;
 }
 
 .add-medicine button:hover {
@@ -80,8 +70,7 @@
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  width: auto; /* Ensure the button width is auto */
-  flex-shrink: 0; /* Prevent the button from shrinking */
+  width: auto;
 }
 
 .add-medicine-button:hover {

@@ -1,27 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaTrash } from 'react-icons/fa'; // Import the trash icon
 import './NewBillPopup.css';
+import axiosInstance from '../../axiosConfig';
 
 const NewBillPopup = ({ newBill, setNewBill, handleAddMedicine, handleMedicineChange, handleSubmit, setShowPopup, error }) => {
-  const [discountType, setDiscountType] = useState('%');
+  const [discountType, setDiscountType] = useState('%')
+  const [medicinesList, setMedicinesList] = useState([])
+
+  useEffect(() => {
+    // Fetch the list of medicines from the API
+    const fetchMedicines = async () => {
+      try {
+        const response = await axiosInstance.get('/api/medicines')
+        setMedicinesList(response.data);
+      } catch (error) {
+        console.error('Failed to fetch medicines', error);
+      }
+    };
+
+    fetchMedicines();
+  }, []);
 
   const handleRemoveMedicine = (index) => {
     const updatedMedicines = newBill.medicines.filter((_, i) => i !== index);
     setNewBill({ ...newBill, medicines: updatedMedicines });
   };
 
+  const handleMedicineValueChange = (e, index) => {
+    const selectedMedicine = medicinesList.find(med => med._id === e.target.value);
+    if (selectedMedicine) {
+      handleMedicineChange(index, 'name', `${selectedMedicine.name}_${selectedMedicine.price}`);
+    }
+  }
+
   const calculateTotal = () => {
     const total = newBill.medicines.reduce((total, medicine) => total + medicine.quantity * medicine.price, 0);
+    const discount = Number(newBill.discount) || 0;
     if (discountType === '%') {
-      return total - (total * (newBill.discount || 10) / 100);
+      return total - (total * discount / 100);
     } else {
-      return total - (newBill.discount || 0);
+      return total - discount;
     }
   };
 
   const calculateTotalBeforeDiscount = () => {
     return newBill.medicines.reduce((total, medicine) => total + medicine.quantity * medicine.price, 0);
-  };
+  }
 
   return (
     <div className="popup">
@@ -33,7 +57,7 @@ const NewBillPopup = ({ newBill, setNewBill, handleAddMedicine, handleMedicineCh
           <input
             type="text"
             className="popup-input"
-            value={newBill.patientName}
+            value={newBill.patientName || ''}
             onChange={(e) => setNewBill({ ...newBill, patientName: e.target.value })}
           />
         </label>
@@ -45,26 +69,29 @@ const NewBillPopup = ({ newBill, setNewBill, handleAddMedicine, handleMedicineCh
         </div>
         {newBill.medicines.map((medicine, index) => (
           <div key={index} className="medicine-input">
-            <input
-              type="text"
-              className="popup-input medicine-name"
-              placeholder="Medicine Name"
-              value={medicine.name}
-              onChange={(e) => handleMedicineChange(index, 'name', e.target.value)}
-            />
+            <select
+              className="popup-input medicine-name medicine-select"
+              value={medicine._id}
+              onChange={(e) => handleMedicineValueChange(e, index)}
+            >
+              <option value="">Select Medicine</option>
+              {medicinesList.map((med) => (
+                <option key={med._id} value={med._id}>{med.name}</option>
+              ))}
+            </select>
             <input
               type="number"
               className="popup-input medicine-quantity"
               placeholder="Quantity"
-              value={medicine.quantity}
+              value={medicine.quantity || 0}
               onChange={(e) => handleMedicineChange(index, 'quantity', e.target.value)}
             />
             <input
               type="number"
               className="popup-input medicine-price"
               placeholder="Price"
-              value={medicine.price}
-              onChange={(e) => handleMedicineChange(index, 'price', e.target.value)}
+              value={medicine.price || 0}
+              readOnly
             />
             <button className="popup-button remove-medicine-from-bill-button" onClick={() => handleRemoveMedicine(index)}>
               <FaTrash /> {/* Use the trash icon */}
@@ -77,7 +104,7 @@ const NewBillPopup = ({ newBill, setNewBill, handleAddMedicine, handleMedicineCh
           <input
             type="number"
             className="popup-input discount"
-            value={newBill.discount !== undefined ? newBill.discount : 10}
+            value={newBill.discount !== undefined ? newBill.discount : 0}
             onChange={(e) => setNewBill({ ...newBill, discount: e.target.value })}
           />
           <select

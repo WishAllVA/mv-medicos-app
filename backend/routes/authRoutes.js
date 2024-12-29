@@ -2,11 +2,12 @@ const express = require('express')
 const router = express.Router()
 const jwt = require('jsonwebtoken')
 const User = require('../models/User')
+const BlacklistedToken = require('../models/BlacklistedToken')
 
 const JWT_SECRET = process.env.JWT_SECRET
 
 // Login endpoint
-router.post('/', async (req, res) => {
+router.post('/login', async (req, res) => {
     const { username, password } = req.body
     try {
         const user = await User.findOne({ username, password })
@@ -29,6 +30,16 @@ router.post('/', async (req, res) => {
             message: 'Internal server error'
         })
     }
+})
+
+// Logout endpoint
+router.post('/logout', async (req, res) => {
+    const token = req.headers.authorization.split(' ')[1]
+    await BlacklistedToken.create({ token })
+    res.status(200).json({
+        success: true,
+        message: 'Logout successful'
+    })
 })
 
 module.exports = router

@@ -75,11 +75,11 @@ const Inventory = () => {
         <button className="add-medicine-button" onClick={() => setIsAddPopupOpen(true)}>Add Medicine</button>
       </div>
       <ul className="medicine-list">
-        {medicines && medicines.map((medicine, index) => (
-          <li key={index} onClick={() => showMedicineInfo(medicine)}>
+        {medicines && medicines.map(({ medicine, quantity }, index) => (
+          <li key={index} onClick={() => showMedicineInfo({ ...medicine, quantity })}>
             <span>{medicine.name}</span>
-            <span>Quantity: {medicine.quantity}</span>
-            <span>MRP: ₹{medicine.mrp}</span>
+            <span>Quantity: {quantity}</span>
+            <span>MRP: ₹{medicine.price}</span>
             <button className="remove-button" onClick={(e) => { e.stopPropagation(); removeMedicine(index); }}>Remove</button>
           </li>
         ))}

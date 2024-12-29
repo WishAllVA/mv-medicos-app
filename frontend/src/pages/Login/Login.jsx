@@ -12,7 +12,7 @@ function Login() {
     const { username, password } = event.target.elements;
 
     try {
-      const response = await axiosInstance.post('/api/login', {
+      const response = await axiosInstance.post('/api/auth/login', {
         username: username.value,
         password: password.value,
       });

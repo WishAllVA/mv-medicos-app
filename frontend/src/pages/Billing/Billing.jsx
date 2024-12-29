@@ -11,7 +11,7 @@ const Billing = () => {
     medicines: [{ name: '', quantity: 0, price: 0 }],
     amount: 0,
     discount: 0,
-  });
+  })
   const [error, setError] = useState('');
   const [filter, setFilter] = useState('all');
 
@@ -22,53 +22,67 @@ const Billing = () => {
       }
     })
     .then(response => {
-      console.log(response)
       setBills(response.data);
     })
     .catch(error => {
       console.error('Error fetching bills', error);
     });
-  }, [filter]);
+  }, [filter])
 
   const handleAddMedicine = () => {
     setNewBill({
       ...newBill,
       medicines: [...newBill.medicines, { name: '', quantity: 0, price: 0 }],
-    });
-  };
+    })
+  }
 
   const handleMedicineChange = (index, field, value) => {
-    const updatedMedicines = newBill.medicines.map((medicine, i) =>
-      i === index ? { ...medicine, [field]: value } : medicine
-    );
-    setNewBill({ ...newBill, medicines: updatedMedicines });
-  };
+    const updateObject = {
+      ...(
+        field === 'name' ? {
+          'name': value.split('_')[0],
+          'price': Number(value.split('_')[1])
+        } :
+        field === 'quantity' || field === 'price' ? { [field]: Number(value) } : { [field]: value }
+      )
+    }
+    const updatedMedicines = newBill.medicines.map((medicine, i) => {
+      if (i === index) {
+        return { ...medicine, ...updateObject }
+      }
+      return medicine
+    })
+    setNewBill((prev) => ({ ...prev, medicines: updatedMedicines }))
+  }
 
   const handleSubmit = async () => {
+    console.log(newBill)
     if (newBill.medicines.length === 0 || newBill.medicines.some(med => !med.name || med.quantity <= 0 || med.price <= 0)) {
       setError("Please add at least one valid medicine.");
-      return;
+      return
     }
-    const newBillWithTime = { ...newBill, time: new Date(), amount: calculateTotal(newBill.medicines) - newBill.discount };
+    const discount = Number(newBill.discount) || 0;
+    const totalAmount = calculateTotal(newBill.medicines);
+    const newBillWithTime = { ...newBill, time: new Date(), amount: totalAmount - discount };
     try {
       const response = await axiosInstance.post('/api/bills/add', newBillWithTime)
-      setBills([...bills, response.data.bill]);
-      setShowPopup(false);
-      setNewBill({ patientName: '', medicines: [{ name: '', quantity: 0, price: 0 }], amount: 0, discount: 0 });
-      setError('');
+      setBills([...bills, response.data.bill])
+      setShowPopup(false)
+      setNewBill({ patientName: '', medicines: [{ name: '', quantity: 0, price: 0 }], amount: 0, discount: 0 })
+      setError('')
     } catch (error) {
       console.error('Error submitting new bill', error);
     }
-  };
+  }
 
   const handleClosePopup = () => {
     setShowPopup(false);
     setNewBill({ patientName: '', medicines: [{ name: '', quantity: 0, price: 0 }], amount: 0, discount: 0 });
-  };
+  }
 
   const calculateTotal = (medicines) => {
-    return medicines.reduce((total, medicine) => total + medicine.quantity * medicine.price, 0);
-  };
+    return medicines.reduce((total, medicine) => total + medicine.quantity * medicine.price, 0)
+  }
 
   return (
     <div className="billing-page">
@@ -103,7 +117,7 @@ const Billing = () => {
                   </li>
                 ))}
               </ul>
-              <p>Total: ₹{calculateTotal(bill.medicines) - bill.discount}</p>
+              <p>Total: ₹{calculateTotal(bill.medicines) - (Number(bill.discount) || 0)}</p>
             </div>
           ))}
       </div>

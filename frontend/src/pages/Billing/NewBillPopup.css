@@ -51,6 +51,10 @@
   text-align: center;
 }
 
+.medicine-select {
+  height: 20%;
+}
+
 .popup-title {
   font-size: 26px;
   margin-bottom: 15px;
@@ -64,8 +68,6 @@
 .popup-input {
   width: 100%;
   padding: 10px;
-  margin-top: 5px;
-  margin-bottom: 15px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }

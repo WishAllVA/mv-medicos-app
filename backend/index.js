@@ -3,10 +3,11 @@ const express = require('express')
 const mongoose = require('./mongoose/mongoose')
 const billRoutes = require('./routes/billRoutes')
 const inventoryRoutes = require('./routes/inventoryRoutes')
-const loginRoutes = require('./routes/loginRoutes')
+const authRoutes = require('./routes/authRoutes')
 const cors = require('cors')
 const jwtMiddleware = require('./middleware/jwtMiddleware')
 const reportsRoutes = require('./routes/reportsRoutes')
+const medicinesRoutes = require('./routes/medicinesRoutes'); // Add this line to import the medicines routes
 
 const app = express()
 const API_LISTENER_PORT = process.env.PORT || 3000
@@ -22,9 +23,6 @@ app.use(cors({
 // Middleware to parse JSON
 app.use(express.json())
 
-// JWT Middleware
-app.use(jwtMiddleware)
-
 // Health check endpoint
 app.use('/health', (req, res, next) => {
     res.status(200).json({
@@ -32,17 +30,23 @@ app.use('/health', (req, res, next) => {
     })
 })
 
+// Login routes
+app.use('/api/auth', authRoutes) // Move this line before the JWT middleware
+
+// JWT Middleware
+app.use(jwtMiddleware)
+
 // Bill routes
 app.use('/api/bills', billRoutes)
 
 // Inventory routes
 app.use('/api/inventory', inventoryRoutes)
 
-// Login routes
-app.use('/api/login', loginRoutes)
-
 // Reports routes
 app.use('/api/reports', reportsRoutes)
+
+// Medicines routes
+app.use('/api/medicines', medicinesRoutes); // Add this line to use the medicines routes
 
 // Error handling middleware
 app.use((err, req, res, next) => {

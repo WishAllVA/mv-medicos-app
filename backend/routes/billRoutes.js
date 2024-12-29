@@ -1,7 +1,8 @@
 const express = require('express')
 const { check, validationResult } = require('express-validator')
 const Bill = require('../models/Bill')
-const Inventory = require('../models/Inventory') // Add Inventory model
+const Inventory = require('../models/Inventory')
+const Medicine = require('../models/Medicine')
 const router = express.Router()
 
 // Route to add a new bill
@@ -29,8 +30,9 @@ router.post('/add', [
 
         // Decrease inventory
         for (const medicine of medicines) {
+            const checkMedicine = await Medicine.findOne({ name: medicine.name })
             await Inventory.updateOne(
-                { medicineId: medicine.id },
+                { medicineId: checkMedicine._id },
                 { $inc: { quantity: -medicine.quantity } }
             )
         }
