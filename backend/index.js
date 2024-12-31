@@ -7,7 +7,7 @@ const authRoutes = require('./routes/authRoutes')
 const cors = require('cors')
 const jwtMiddleware = require('./middleware/jwtMiddleware')
 const reportsRoutes = require('./routes/reportsRoutes')
-const medicinesRoutes = require('./routes/medicinesRoutes'); // Add this line to import the medicines routes
+const medicinesRoutes = require('./routes/medicinesRoutes')
 
 const app = express()
 const API_LISTENER_PORT = process.env.PORT || 3000

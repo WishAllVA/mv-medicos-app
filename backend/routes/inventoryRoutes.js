@@ -9,8 +9,6 @@ const router = express.Router()
 router.post('/add', [
     check('name').not().isEmpty().withMessage('Name is required'),
     check('quantity').isInt({ gt: 0 }).withMessage('Quantity should be a positive integer'),
-    check('manufacturer').not().isEmpty().withMessage('Manufacturer is required'),
-    check('salt').not().isEmpty().withMessage('Salt is required'),
     check('price').isFloat({ gt: 0 }).withMessage('Price should be a positive number'),
     // check('expiryDate').isISO8601().withMessage('Expiry date is required and should be a valid date')
 ], async (req, res) => {
@@ -39,11 +37,7 @@ router.post('/add', [
 router.get('/', async (req, res) => {
     const { sort, limit, offset, search, searchBy } = req.query
     try {
-        const totalCount = await Inventory.countDocuments()
         const pipeline = [
-            { $sort: sort ? { [sort]: 1 } : {} },
-            { $skip: offset ? parseInt(offset) : 0 },
-            { $limit: limit ? parseInt(limit) : 0 },
             { $lookup: {
                 from: 'medicines',
                 localField: 'medicineId',
@@ -51,10 +45,30 @@ router.get('/', async (req, res) => {
                 as: 'medicine'
             }},
             { $unwind: '$medicine' },
-            { $match: search && searchBy ? { [`medicine.${searchBy}`]: { $regex: search, $options: 'i' } } : {} }
+            { $match: search && searchBy ? { [`medicine.${searchBy}`]: { $regex: search, $options: 'i' } } : {} },
+            // Move the sort stage after the lookup and unwind stages
+            { $sort: sort ? { [`medicine.${sort}`]: 1 } : {} },
+            { $skip: offset ? parseInt(offset) : 0 },
+            { $limit: limit ? parseInt(limit) : 0 }
         ];
-
+        let totalCount = 0
         const medicines = await Inventory.aggregate(pipeline);
+        if (search && searchBy) {
+            totalCount = await Inventory.aggregate([
+                { $lookup: {
+                    from: 'medicines',
+                    localField: 'medicineId',
+                    foreignField: '_id',
+                    as: 'medicine'
+                }},
+                { $unwind: '$medicine' },
+                { $match: { [`medicine.${searchBy}`]: { $regex: search, $options: 'i' } } },
+                { $count: 'count' }
+            ])
+            totalCount = totalCount.length ? totalCount[0].count : 0
+        } else {
+            totalCount = await Inventory.countDocuments()
+        }
 
         res.status(200).json({ success: true, medicines, totalCount });
     } catch (err) {
@@ -74,10 +88,10 @@ router.put('/update/:id', [
     }
 
     const { id } = req.params
-    const { quantity, expiryDate } = req.body
+    const { quantity, name, price, manufacturer, salt } = req.body
 
     try {
-        const inventoryItem = await Inventory.findById(id).populate('medicine')
+        const inventoryItem = await Inventory.findById(id).populate('medicineId')
         if (!inventoryItem) {
             return res.status(404).json({ error: 'Inventory item not found' })
         }
@@ -86,11 +100,22 @@ router.put('/update/:id', [
             inventoryItem.quantity = quantity
         }
 
-        if (expiryDate !== undefined) {
-            inventoryItem.medicine.expiryDate = expiryDate
-            await inventoryItem.medicine.save()
+        if (name !== undefined) {
+            inventoryItem.medicineId.name = name
         }
 
+        if (price !== undefined) {
+            inventoryItem.medicineId.price = price
+        }
+
+        if (salt !== undefined) {
+            inventoryItem.medicineId.salt = salt
+        }
+
+        if (manufacturer !== undefined) {
+            inventoryItem.medicineId.manufacturer = manufacturer
+        }
+        await inventoryItem.medicineId.save()
         await inventoryItem.save()
         res.status(200).json(inventoryItem)
     } catch (err) {

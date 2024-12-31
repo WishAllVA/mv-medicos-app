@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import './AddMedicinePopup.css';
+import React, { useState, useEffect } from 'react';
+import './EditMedicinePopup.css';
 
-const AddMedicinePopup = ({ onAdd, onClose }) => {
+const EditMedicinePopup = ({ medicine, onEdit, onClose }) => {
   const [name, setName] = useState('');
   const [salt, setSalt] = useState('');
   const [quantity, setQuantity] = useState('');
@@ -9,19 +9,29 @@ const AddMedicinePopup = ({ onAdd, onClose }) => {
   const [mrp, setMrp] = useState('');
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    if (medicine) {
+      setName(medicine.name || '');
+      setSalt(medicine.salt || '');
+      setQuantity(medicine.quantity || '');
+      setManufacturer(medicine.manufacturer || '');
+      setMrp(medicine.price || '');
+    }
+  }, [medicine]);
+
   const handleSubmit = () => {
     if (!name || !quantity) {
       setError('Name and Quantity are required.');
       return;
     }
-    const medicineDetails = { name, salt, quantity, manufacturer, price: mrp };
-    onAdd(medicineDetails);
+    const updatedMedicineDetails = { ...medicine, name, salt, quantity, manufacturer, price: mrp };
+    onEdit(updatedMedicineDetails);
   };
 
   return (
     <div className="popup">
       <div className="popup-content">
-        <h2>Add Medicine</h2>
+        <h2>Edit Medicine</h2>
         {error && <p className="error">{error}</p>}
         <input 
           type="text" 
@@ -54,7 +64,7 @@ const AddMedicinePopup = ({ onAdd, onClose }) => {
           placeholder="MRP" 
         />
         <div className="button-group">
-          <button onClick={handleSubmit}>Add</button>
+          <button onClick={handleSubmit}>Save</button>
           <button onClick={onClose}>Close</button>
         </div>
       </div>
@@ -62,4 +72,4 @@ const AddMedicinePopup = ({ onAdd, onClose }) => {
   );
 };
 
-export default AddMedicinePopup;
+export default EditMedicinePopup;

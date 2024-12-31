@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import './Inventory.css'
 import MedicinePopup from './MedicinePopup.jsx'
 import AddMedicinePopup from './AddMedicinePopup.jsx'
+import EditMedicinePopup from './EditMedicinePopup.jsx'
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import axiosInstance from '../../axiosConfig'
 
@@ -9,6 +10,8 @@ const Inventory = () => {
   const [medicines, setMedicines] = useState([])
   const [selectedMedicine, setSelectedMedicine] = useState(null)
   const [isAddPopupOpen, setIsAddPopupOpen] = useState(false)
+  const [isEditPopupOpen, setIsEditPopupOpen] = useState(false)
+  const [medicineToEdit, setMedicineToEdit] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [searchQuery, setSearchQuery] = useState('')
@@ -16,12 +19,18 @@ const Inventory = () => {
   const limit = 10
 
   useEffect(() => {
-    console.log('useEffect')
     const fetchMedicines = async () => {
       const offset = (currentPage - 1) * limit
       try {
         const response = await axiosInstance.get(`/api/inventory?sort=name&limit=${limit}&offset=${offset}&search=${searchQuery}&searchBy=${searchBy}`)
-        setMedicines(response.data.medicines)
+        const medicinesToSet = response.data.medicines.map((medicine) => {
+          return {
+            ...medicine.medicine,
+            quantity: medicine.quantity,
+            inventoryId: medicine._id
+          }
+        })
+        setMedicines(medicinesToSet)
         setTotalPages(Math.ceil(response.data.totalCount / limit))
       } catch (error) {
         console.error('Error:', error)
@@ -39,7 +48,14 @@ const Inventory = () => {
       const fetchUpdatedMedicines = async () => {
         try {
           const response = await axiosInstance.get(`/api/inventory?sort=name&limit=${limit}&offset=${offset}`)
-          setMedicines(response.data.medicines)
+          const medicinesToSet = response.data.medicines.map((medicine) => {
+            return {
+              ...medicine.medicine,
+              quantity: medicine.quantity,
+              inventoryId: medicine._id
+            }
+          })
+          setMedicines(medicinesToSet)
           setTotalPages(Math.ceil(response.data.totalCount / limit))
         } catch (error) {
           console.error('Error:', error)
@@ -47,6 +63,21 @@ const Inventory = () => {
       }
       fetchUpdatedMedicines()
       setIsAddPopupOpen(false)
+    } catch (error) {
+      console.error('Error:', error)
+    }
+  }
+
+  const editMedicine = async (medicineDetails) => {
+    try {
+      const response = await axiosInstance.put(`/api/inventory/update/${medicineDetails.inventoryId}`, medicineDetails)
+      const updatedMedicine = response.data
+      setMedicines((prevMedicines) =>
+        prevMedicines.map((medicine) =>
+          medicine.inventoryId === updatedMedicine._id ? { ...medicine, medicine: updatedMedicine.medicine, inventoryId: updatedMedicine._id } : medicine
+        )
+      )
+      setIsEditPopupOpen(false)
     } catch (error) {
       console.error('Error:', error)
     }
@@ -65,6 +96,11 @@ const Inventory = () => {
 
   const showMedicineInfo = (medicine) => {
     setSelectedMedicine(medicine);
+  }
+
+  const openEditPopup = (medicine) => {
+    setMedicineToEdit(medicine)
+    setIsEditPopupOpen(true)
   }
 
   const closePopup = () => {
@@ -96,14 +132,17 @@ const Inventory = () => {
           <span>Medicine Name</span>
           <span>Quantity</span>
           <span>MRP</span>
-          <span></span> {/* Empty span for the remove button column */}
+          <span></span> {/* Empty span for the buttons column */}
         </li>
-        {medicines && medicines.map(({ medicine, quantity }, index) => (
-          <li key={index} onClick={() => showMedicineInfo({ ...medicine, quantity })}>
+        {medicines && medicines.map((medicine, index) => (
+          <li key={index} onClick={() => showMedicineInfo(medicine)}>
             <span>{medicine.name}</span>
-            <span>{quantity}</span>
+            <span>{medicine.quantity}</span>
             <span>₹{medicine.price}</span>
-            <button className="remove-button" onClick={(e) => { e.stopPropagation(); removeMedicine(index); }}>Remove</button>
+            <span>
+              <button className="edit-button" onClick={(e) => { e.stopPropagation(); openEditPopup(medicine); }}>Edit</button>
+              <button className="remove-button" onClick={(e) => { e.stopPropagation(); removeMedicine(index); }}>Remove</button>
+            </span>
           </li>
         ))}
       </ul>
@@ -121,6 +160,9 @@ const Inventory = () => {
       )}
       {isAddPopupOpen && (
         <AddMedicinePopup onAdd={addMedicine} onClose={() => setIsAddPopupOpen(false)} />
+      )}
+      {isEditPopupOpen && (
+        <EditMedicinePopup medicine={medicineToEdit} onEdit={editMedicine} onClose={() => setIsEditPopupOpen(false)} />
       )}
     </div>
   );

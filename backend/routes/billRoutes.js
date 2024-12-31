@@ -11,6 +11,7 @@ router.post('/add', [
     check('discount').optional().isNumeric().withMessage('Discount must be a number'),
     check('medicines').isArray({ min: 1 }).withMessage('Medicines must be an array with at least one item'),
     check('patientName').optional().isString().withMessage('Patient name must be a string'),
+    check('paymentMode').isIn(['cash', 'online']).withMessage('Invalid payment mode'),
     check('time').custom((value) => {
         if (new Date(value) > Date.now()) {
             throw new Error('Time cannot be in the future')
@@ -23,9 +24,9 @@ router.post('/add', [
         return res.status(400).json({ errors: errors.array() })
     }
 
-    const { amount, discount, medicines, patientName, time } = req.body
+    const { amount, discount, medicines, patientName, paymentMode, time } = req.body
     try {
-        const newBill = new Bill({ amount, discount, medicines, patientName, time })
+        const newBill = new Bill({ amount, discount, medicines, patientName, paymentMode, time })
         await newBill.save()
 
         // Decrease inventory

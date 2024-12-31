@@ -31,6 +31,7 @@ axiosInstance.interceptors.response.use(
       } catch (logoutError) {
         console.error('Logout failed:', logoutError);
       }
+      localStorage.removeItem('token');
       window.location.href = '/login';
     }
     return Promise.reject(error);

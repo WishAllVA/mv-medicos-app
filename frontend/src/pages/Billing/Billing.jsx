@@ -42,6 +42,7 @@ const Billing = () => {
     medicines: [{ name: '', quantity: 0, price: 0 }],
     amount: 0,
     discount: 0,
+    paymentMode: 'cash',
   });
   const [error, setError] = useState('');
   const [filter, setFilter] = useState('today');
@@ -91,7 +92,7 @@ const Billing = () => {
     setNewBill((prev) => ({ ...prev, medicines: updatedMedicines }))
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (paymentMode) => {
     console.log(newBill)
     if (newBill.medicines.length === 0 || newBill.medicines.some(med => !med.name || med.quantity <= 0 || med.price <= 0)) {
       setError("Please add at least one valid medicine.");
@@ -99,12 +100,23 @@ const Billing = () => {
     }
     const discount = Number(newBill.discount) || 0;
     const totalAmount = calculateTotal(newBill.medicines);
-    const newBillWithTime = { ...newBill, time: new Date(), amount: totalAmount - discount };
+    const newBillWithTime = { 
+      ...newBill, 
+      time: new Date(), 
+      amount: (totalAmount - discount).toFixed(2), 
+      paymentMode 
+    };
     try {
       const response = await axiosInstance.post('/api/bills/add', newBillWithTime)
       setBills([...bills, response.data.bill])
       setShowPopup(false)
-      setNewBill({ patientName: '', medicines: [{ name: '', quantity: 0, price: 0 }], amount: 0, discount: 0 })
+      setNewBill({ 
+        patientName: '', 
+        medicines: [{ name: '', quantity: 0, price: 0 }], 
+        amount: 0, 
+        discount: 0, 
+        paymentMode: 'cash' 
+      })
       setError('')
     } catch (error) {
       console.error('Error submitting new bill', error);
@@ -117,7 +129,7 @@ const Billing = () => {
   }
 
   const calculateTotal = (medicines) => {
-    return medicines.reduce((total, medicine) => total + medicine.quantity * medicine.price, 0)
+    return medicines.reduce((total, medicine) => total + medicine.quantity * medicine.price, 0).toFixed(2);
   }
 
   return (
@@ -162,7 +174,7 @@ const Billing = () => {
                   </li>
                 ))}
               </ul>
-              <p className="bill-total">Total: ₹{calculateTotal(bill.medicines) - (Number(bill.discount) || 0)}</p>
+              <p className="bill-total">Total: ₹{(calculateTotal(bill.medicines) - (Number(bill.discount) || 0)).toFixed(2)}</p>
             </div>
           ))}
       </div>

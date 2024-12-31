@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { FaTrash } from 'react-icons/fa'; // Import the trash icon
+import { FaTrash, FaRegCircle, FaDotCircle } from 'react-icons/fa'; // Import the icons
 import './NewBillPopup.css';
 import axiosInstance from '../../axiosConfig';
 
 const NewBillPopup = ({ newBill, setNewBill, handleAddMedicine, handleMedicineChange, handleSubmit, setShowPopup, error }) => {
   const [discountType, setDiscountType] = useState('%')
   const [medicinesList, setMedicinesList] = useState([])
+  const [paymentMode, setPaymentMode] = useState(newBill.paymentMode || 'cash'); // Initialize with newBill.paymentMode
+
+  useEffect(() => {
+    setNewBill({ ...newBill, paymentMode });
+  }, [paymentMode]);
 
   useEffect(() => {
     // Fetch the list of medicines from the API
@@ -37,14 +42,14 @@ const NewBillPopup = ({ newBill, setNewBill, handleAddMedicine, handleMedicineCh
     const total = newBill.medicines.reduce((total, medicine) => total + medicine.quantity * medicine.price, 0);
     const discount = Number(newBill.discount) || 0;
     if (discountType === '%') {
-      return total - (total * discount / 100);
+      return (total - (total * discount / 100)).toFixed(2);
     } else {
-      return total - discount;
+      return (total - discount).toFixed(2);
     }
   };
 
   const calculateTotalBeforeDiscount = () => {
-    return newBill.medicines.reduce((total, medicine) => total + medicine.quantity * medicine.price, 0);
+    return newBill.medicines.reduce((total, medicine) => total + medicine.quantity * medicine.price, 0).toFixed(2);
   }
 
   return (
@@ -117,11 +122,19 @@ const NewBillPopup = ({ newBill, setNewBill, handleAddMedicine, handleMedicineCh
           </select>
         </label>
         <div className="popup-total">
-          <h3>Total: ₹{calculateTotal().toFixed(2)}</h3>
-          <p className="total-before-discount">Before Discount: ₹{calculateTotalBeforeDiscount().toFixed(2)}</p>
+          <h3>Total: ₹{calculateTotal()}</h3>
+          <p className="total-before-discount">Before Discount: ₹{calculateTotalBeforeDiscount()}</p>
+        </div>
+        <div className="popup-slider">
+          <div className="slider-option" onClick={() => setPaymentMode('cash')}>
+            {paymentMode === 'cash' ? <FaDotCircle /> : <FaRegCircle />} Cash
+          </div>
+          <div className="slider-option" onClick={() => setPaymentMode('online')}>
+            {paymentMode === 'online' ? <FaDotCircle /> : <FaRegCircle />} Online
+          </div>
         </div>
         <div className="popup-actions">
-          <button className="popup-button" onClick={handleSubmit}>Submit</button>
+          <button className="popup-button" onClick={() => handleSubmit(paymentMode)}>Submit</button>
           <button className="popup-button cancel" onClick={() => setShowPopup(false)}>Cancel</button>
         </div>
       </div>

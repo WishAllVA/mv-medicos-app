@@ -34,12 +34,20 @@ router.post('/login', async (req, res) => {
 
 // Logout endpoint
 router.post('/logout', async (req, res) => {
-    const token = req.headers.authorization.split(' ')[1]
-    await BlacklistedToken.create({ token })
-    res.status(200).json({
-        success: true,
-        message: 'Logout successful'
-    })
+    try {
+        const token = req.headers.authorization.split(' ')[1]
+        await BlacklistedToken.create({ token })
+        res.status(200).json({
+            success: true,
+            message: 'Logout successful'
+        })
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        })
+    }
 })
 
 module.exports = router
