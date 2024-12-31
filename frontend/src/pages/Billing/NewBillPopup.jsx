@@ -16,7 +16,7 @@ const NewBillPopup = ({ newBill, setNewBill, handleAddMedicine, handleMedicineCh
     // Fetch the list of medicines from the API
     const fetchMedicines = async () => {
       try {
-        const response = await axiosInstance.get('/api/medicines')
+        const response = await axiosInstance.get('/api/medicines?sort=name');
         setMedicinesList(response.data);
       } catch (error) {
         console.error('Failed to fetch medicines', error);
