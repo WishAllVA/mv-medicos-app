@@ -4,6 +4,8 @@ import axiosInstance from '../../axiosConfig';
 import './Login.css';
 
 function Login() {
+  console.log('Login component rendered');
+  console.log(process.env.VITE_API_URL);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
