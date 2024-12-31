@@ -14,7 +14,7 @@ const API_LISTENER_PORT = process.env.PORT || 3000
 
 // CORS middleware to allow specific headers and credentials
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: process.env.FRONTEND_URL,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true

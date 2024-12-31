@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:3000', // Add the backend host here
+  baseURL: process.env.VITE_API_URL,
   withCredentials: true
 });
 
